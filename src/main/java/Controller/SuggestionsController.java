@@ -1,12 +1,15 @@
 package Controller;
 
 
+import Suggestion.DataManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 
 
 @RestController
@@ -23,6 +26,10 @@ public class SuggestionsController
         {
             return ResponseEntity.badRequest().body("Invalid Parameters. Given:" + query + ".");
         }
+
+        DataManager localDataManager = DataManager.getDataManagerInstance();
+
+        HashMap local = localDataManager.getCities();
 
 //        Generate Entities
 
