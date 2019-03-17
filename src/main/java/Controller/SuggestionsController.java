@@ -1,16 +1,19 @@
 package Controller;
 
 
+import Entity.GeoNameCity;
 import Suggestion.DataManager;
 import Suggestion.MatchGenerator;
+import Suggestion.SuggestionScore;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -22,22 +25,29 @@ public class SuggestionsController
                                                             @RequestParam(name="longitude", required = false) String longitude,
                                                             @RequestParam(name="latitude",required = false) String latitude) throws Exception
     {
-        //Check parameters
         if(invalidGetParameters(query,longitude,latitude))
         {
             return ResponseEntity.badRequest().body("Invalid Parameters. Given:" + query + ".");
         }
 
         DataManager localDataManager = DataManager.getDataManagerInstance();
+        MatchGenerator mg = new MatchGenerator();
 
-        HashMap local = localDataManager.getCities();
+        List<GeoNameCity> filteredCities = mg.reducedList(localDataManager.getCities(),query);
 
-        MatchGenerator temp = new MatchGenerator();
+        for(Object temp: filteredCities)
+        {
+            System.out.println(temp);
+        }
 
-        temp.reducedList(local,query);
-//        Generate Entities
+        SuggestionScore sc = new SuggestionScore();
+        List storedSuggestion = sc.sortSuggestion(filteredCities,latitude,longitude,query);
 
-//        Create Json Structure
+        System.out.println("_________________________");
+        for(Object temp: storedSuggestion)
+        {
+            System.out.println(temp);
+        }        //        Create Json Structure
 
         {
             return ResponseEntity.ok("Temp");

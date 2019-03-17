@@ -16,7 +16,9 @@ public class GeoNameCity
      * Alt country code name, comma separated
      */
     private String altCountryCode;
+    private String timeZone;
     private int population;
+
 
     /**
      * Constructor for the City Entity
@@ -30,7 +32,7 @@ public class GeoNameCity
      * @param altCountryCode
      * @param population
      */
-    public GeoNameCity(int id, String name, String ascii, String altName, String latitude, String longitude, String country, String altCountryCode, int population)
+    public GeoNameCity(int id, String name, String ascii, String altName, String latitude, String longitude, String country, String altCountryCode,String timeZone, int population)
     {
         this.id = id;
         this.name = name;
@@ -40,6 +42,7 @@ public class GeoNameCity
         this.longitude = longitude;
         this.country = country;
         this.altCountryCode = altCountryCode;
+        this.timeZone = timeZone;
         this.population = population;
     }
 
@@ -86,5 +89,10 @@ public class GeoNameCity
     public int getPopulation()
     {
         return population;
+    }
+
+    public String getTimeZone()
+    {
+        return timeZone;
     }
 }

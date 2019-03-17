@@ -43,8 +43,9 @@ public class DataManager
                     record.getString("long"),
                     record.getString("country"),
                     record.getString("cc2"),
+                    record.getString("tz"),
                     record.getInt("population"));
-            String key = record.getString("name") + ", " + record.getString("country") + ", " + record.getInt("id");
+            String key = record.getString("name") + ", " + record.getString("country") + ", " + record.getString("tz") + ", " + record.getInt("id");
             cities.put(key, tempCity);
         }
 
