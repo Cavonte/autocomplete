@@ -2,6 +2,7 @@ package Controller;
 
 
 import Suggestion.DataManager;
+import Suggestion.MatchGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,9 @@ public class SuggestionsController
 
         HashMap local = localDataManager.getCities();
 
+        MatchGenerator temp = new MatchGenerator();
+
+        temp.reducedList(local,query);
 //        Generate Entities
 
 //        Create Json Structure

@@ -95,6 +95,13 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>data</directory>
+				<targetPath>data</targetPath>
+			</resource>
+		</resources>
 	</build>
 
 </project>

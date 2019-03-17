@@ -17,22 +17,20 @@ public class GeoNameCity
      */
     private String altCountryCode;
     private int population;
-    private int elevation;
 
     /**
      * Constructor for the City Entity
      * @param id
      * @param name
      * @param ascii
-     * @param alt_name
+     * @param altName
      * @param latitude
      * @param longitude
      * @param country
      * @param altCountryCode
      * @param population
-     * @param elevation
      */
-    public GeoNameCity(int id, String name, String ascii, String altName, String latitude, String longitude, String country, String altCountryCode, int population, int elevation)
+    public GeoNameCity(int id, String name, String ascii, String altName, String latitude, String longitude, String country, String altCountryCode, int population)
     {
         this.id = id;
         this.name = name;
@@ -43,7 +41,6 @@ public class GeoNameCity
         this.country = country;
         this.altCountryCode = altCountryCode;
         this.population = population;
-        this.elevation = elevation;
     }
 
     public int getId()
@@ -89,10 +86,5 @@ public class GeoNameCity
     public int getPopulation()
     {
         return population;
-    }
-
-    public int getElevation()
-    {
-        return elevation;
     }
 }
