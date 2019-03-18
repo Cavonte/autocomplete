@@ -43,24 +43,13 @@ public class SuggestionsController
         }
 
         DataManager localDataManager = DataManager.getDataManagerInstance();
-        MatchGenerator mg = new MatchGenerator();
+        MatchGenerator matchGenerator = new MatchGenerator();
+        List<GeoNameCity> filteredCities = matchGenerator.reducedList(localDataManager.getCities(), query);
 
-        List<GeoNameCity> filteredCities = mg.reducedList(localDataManager.getCities(), query);
-
-        SuggestionScore sc = new SuggestionScore();
-        JSONArray result;
-
-        if (latitude != null && longitude != null)
-        {
-            Coordinate location = new Coordinate(latitude, longitude);
-            List<GeoNameCity> storedSuggestion = sc.sortSuggestion(filteredCities, location, query);
-            result = sc.prepareResultArray(storedSuggestion, location);
-        }
-        else
-        {
-            List<GeoNameCity> storedSuggestion = sc.sortSuggestion(filteredCities, null, query);
-            result = sc.prepareResultArray(storedSuggestion, null);
-        }
+        Coordinate location = new Coordinate(latitude, longitude);
+        SuggestionScore suggestionScore = new SuggestionScore();
+        List<GeoNameCity> storedSuggestion = suggestionScore.sortSuggestion(filteredCities, location, query);
+        JSONArray result = suggestionScore.prepareResultArray(storedSuggestion, location);
 
         System.out.println(result.toString(1));
         System.out.println("Request Ended.");
@@ -69,7 +58,7 @@ public class SuggestionsController
     }
 
     /**
-     * Returns true if one of the parameters is invalid, e.g. empty string     *
+     * Returns true if one of the parameters is invalid, e.g. empty string
      *
      * @param query     from request
      * @param longitude of request
@@ -82,11 +71,10 @@ public class SuggestionsController
         {
             return query.length() < 1 ||
                     NumberUtils.isParsable(query) ||
-                    !query.matches("\\w+");
+                    query.matches("\\d+");
         }
         else
         {
-
             return longitude == null ||
                     latitude == null ||
                     query.length() < 1 ||

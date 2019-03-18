@@ -51,9 +51,32 @@ public class SuggestionsControllerTest
         assertTrue(suggestions.length == 0);
     }
 
+    /**
+     * See method name.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void validSuggestionRequestWithEdgeCases() throws Exception
+    {
+        String url = "/suggestions";
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "St----Coincoin ボーリング des Meumeux")
+                .param("latitude", "45.5011231237")
+                .param("longitude", "73.567312312312")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+        assertTrue(suggestions.length == 0);
+    }
+
 
     /**
-     * Checks for both the accuracy of the word similarity and the sorting of the distances when the name of the cities are similar.
+     * Should fail if there are coordinates but one of them is invalid.
      * e.g. Multiple lexingtons
      *
      * @throws Exception
@@ -102,6 +125,10 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[2].get("distance (in km)").asDouble() < suggestions[3].get("distance (in km)").asDouble());
     }
 
+    /**
+     * Default behavior
+     * @throws Exception
+     */
     @Test
     public void validSuggestionRequestWithNoLocation() throws Exception
     {

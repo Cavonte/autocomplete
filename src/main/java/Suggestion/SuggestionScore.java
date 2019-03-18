@@ -27,7 +27,7 @@ public class SuggestionScore
     {
         Damerau damerau = new Damerau();
         Comparator<GeoNameCity> comparator = Comparator.comparing(city -> damerau.distance(query.trim().toLowerCase(),city.getName().toLowerCase()));
-        if(location != null)
+        if(location.isValidCoordinate())
         comparator = comparator.thenComparing(Comparator.comparing(city -> calculateDistance(location,city)));
 
         Stream<GeoNameCity> cityStream = filteredCities.stream().sorted(comparator);
@@ -91,7 +91,7 @@ public class SuggestionScore
         {
             JSONObject cityJson = new JSONObject();
             cityJson.put("name", geoNameCity.getName() + ", " + geoNameCity.getTimeZone() + ", " + geoNameCity.getCountry());
-            if(coordinate != null)
+            if(coordinate.isValidCoordinate())
             cityJson.put("distance (in km)", String.format("%.3f", calculateDistance(coordinate,geoNameCity)));
             cityJson.put("score", Double.parseDouble(String.format("%.2f", calculateScore(sortedList, geoNameCity))));
             cityJson.put("id", geoNameCity.getId());
