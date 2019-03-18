@@ -1,14 +1,14 @@
 package Suggestion;
 
+import Entity.Coordinate;
 import Entity.GeoNameCity;
-import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
-import info.debatty.java.stringsimilarity.WeightedLevenshtein;
-
-import java.util.ArrayList;
+import info.debatty.java.stringsimilarity.Damerau;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,11 +23,11 @@ public class SuggestionScore
      * @param query
      * @return
      */
-    public List sortSuggestion(List<GeoNameCity> filteredCities, String currentLatitude, String currentLongitude, String query)
+    public List<GeoNameCity> sortSuggestion(List<GeoNameCity> filteredCities, Coordinate location, String query)
     {
-        NormalizedLevenshtein levenshtein = new NormalizedLevenshtein();
-        Comparator<GeoNameCity> comparator = Comparator.comparing(city -> levenshtein.distance(query,city.getName()));
-        comparator = comparator.thenComparing(Comparator.comparing(city -> calculateDistance(currentLatitude,currentLongitude,city)));
+        Damerau damerau = new Damerau();
+        Comparator<GeoNameCity> comparator = Comparator.comparing(city -> damerau.distance(query,city.getName()));
+        comparator = comparator.thenComparing(Comparator.comparing(city -> calculateDistance(location,city)));
 
         Stream<GeoNameCity> cityStream = filteredCities.stream().sorted(comparator);
         return cityStream.collect(Collectors.toList());
@@ -40,26 +40,27 @@ public class SuggestionScore
      * @param currentCity
      * @return
      */
-    public double calculateScore(ArrayList scoredList, GeoNameCity currentCity)
+    public double calculateScore(List scoredList, GeoNameCity currentCity)
     {
-        return scoredList.indexOf(currentCity)/scoredList.size();
+        double index = scoredList.indexOf(currentCity) + 1;
+        double adjustedSize = (double)scoredList.size() + 1;
+        return 1-(index/adjustedSize);
     }
 
 
     /**
-     * http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
-     * @param currentLatitude
-     * @param CurrentLongitude
+     *  http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
+     * @param location
      * @param targetCity
      * @return
      */
-    public double calculateDistance(String currentLatitude, String CurrentLongitude, GeoNameCity targetCity)
+    public double calculateDistance(Coordinate location, GeoNameCity targetCity)
     {
         double earthRadius = 6371.0;
-        double lat1 = Double.parseDouble(currentLatitude)/1E6;
         double lat2 = Double.parseDouble(targetCity.getLatitude())/1E6;
-        double lon1 = Double.parseDouble(CurrentLongitude)/1E6;
         double lon2 = Double.parseDouble(targetCity.getLongitude())/1E6;
+        double lat1 = location.getLatitude()/1E6;
+        double lon1 = location.getLongitude()/1E6;
         double dLat = Math.toRadians(lat2-lat1);
         double dLon = Math.toRadians(lon2-lon1);
         double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -68,4 +69,25 @@ public class SuggestionScore
         double c = 2 * Math.asin(Math.sqrt(a));
         return earthRadius * c;
     }
+
+
+    public JSONArray prepareResultArray(List<GeoNameCity> scoredList, Coordinate coordinate) throws JSONException
+    {
+        JSONArray result = new JSONArray();
+        for (GeoNameCity geoNameCity : scoredList)
+        {
+            //name : city/timezone/ country
+            //distance(in kilometers) : distance
+            //score : current score
+            //id : id of the xity
+            JSONObject cityJson = new JSONObject();
+            cityJson.put("name", geoNameCity.getName() + ", " + geoNameCity.getTimeZone() + "," + geoNameCity.getCountry());
+            cityJson.put("distance (in km)", String.format("%.3f", calculateDistance(coordinate,geoNameCity)));
+            cityJson.put("score", String.format("%.2f", calculateScore(scoredList, geoNameCity)));
+            cityJson.put("id", geoNameCity.getId());
+            result.put(cityJson);
+        }
+        return result;
+    }
+
 }
