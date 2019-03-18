@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,44 +28,84 @@ public class SuggestionsControllerTest
     @Autowired
     private MockMvc mockMvc;
 
-
     /**
-     * Method Simplifier
+     * See method name.
      *
-     * @param query
-     * @param longitude
-     * @param latitude
-     * @param url
-     * @param expected
      * @throws Exception
      */
-    private void performCall(String query,
-                             String longitude,
-                             String latitude,
-                             String url,
-                             String expected) throws Exception
+    @Test
+    public void validSuggestionRequestWithNonExistentCity() throws Exception
     {
-        this.mockMvc.perform(get(url)
-                .param("q", query)
-                .param("longitude", longitude)
-                .param("latitude", latitude)
+        String url = "/suggestions";
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "St-Coincoin des Meumeux")
+                .param("latitude", "45.5017")
+                .param("longitude", "73.5673")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+        assertTrue(suggestions.length == 0);
     }
 
+
+    /**
+     * Checks for both the accuracy of the word similarity and the sorting of the distances when the name of the cities are similar.
+     * e.g. Multiple lexingtons
+     *
+     * @throws Exception
+     */
+    @Test
+    public void validSuggestionRequestWithInvalidLocation() throws Exception
+    {
+        String url = "/suggestions";
+        String expected = "Invalid Parameters. Given: lexingt";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "lexingt")
+                .param("latitude", "45.5017")
+                .param("longitude", "invalid")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Checks for both the accuracy of the word similarity and the sorting of the distances when the name of the cities are similar.
+     * e.g. Multiple lexingtons
+     *
+     * @throws Exception
+     */
     @Test
     public void validSuggestionRequestWithLocation() throws Exception
     {
         String url = "/suggestions";
-        performCall("london", "45.5017", "73.5673", url, "");
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "lexingt")
+                .param("latitude", "45.5017")
+                .param("longitude", "73.5673")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+
+        assertTrue(suggestions[0].get("name").asText().toLowerCase().contains("lexington"));
+
+        assertTrue(suggestions[0].get("distance (in km)").asDouble() < suggestions[1].get("distance (in km)").asDouble());
+        assertTrue(suggestions[1].get("distance (in km)").asDouble() < suggestions[2].get("distance (in km)").asDouble());
+        assertTrue(suggestions[2].get("distance (in km)").asDouble() < suggestions[3].get("distance (in km)").asDouble());
     }
 
     @Test
     public void validSuggestionRequestWithNoLocation() throws Exception
     {
         String url = "/suggestions";
-
-
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
@@ -81,14 +120,12 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
-
     }
 
     @Test
     public void invalidSuggestionRequestNoParam() throws Exception
     {
         String url = "/suggestions";
-        String expected = "Invalid Parameters. Given:";
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
