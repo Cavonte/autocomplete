@@ -1,8 +1,7 @@
 package Entity;
 
-
 /**
- * Entity class for locations.
+ * Entity class for coordinates.
  *
  */
 public class Coordinate

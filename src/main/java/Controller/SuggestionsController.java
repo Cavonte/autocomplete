@@ -7,6 +7,7 @@ import Suggestion.DataManager;
 import Suggestion.MatchGenerator;
 import Suggestion.SuggestionScore;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,55 +21,64 @@ import java.util.List;
 public class SuggestionsController
 {
 
+    /**
+     * Main enpoint. Handles request with and without a location.
+     * @param query for suggestion
+     * @param longitude of request
+     * @param latitude request
+     * @return JSON Array with suggestion
+     * @throws JSONException At response creation
+     */
     @RequestMapping(value = "/suggestions", method = RequestMethod.GET, produces = "Application/Text")
     public ResponseEntity autoCompleteSuggestions(@RequestParam(name = "q") String query,
                                                   @RequestParam(name = "longitude", required = false) String longitude,
-                                                  @RequestParam(name = "latitude", required = false) String latitude) throws Exception
+                                                  @RequestParam(name = "latitude", required = false) String latitude) throws JSONException
     {
         if (invalidGetParameters(query, longitude, latitude))
         {
             return ResponseEntity.badRequest().body("Invalid Parameters. Given:" + query + ".");
         }
 
-        Coordinate location = new Coordinate(latitude,longitude);
+        Coordinate location = new Coordinate(latitude, longitude);
         DataManager localDataManager = DataManager.getDataManagerInstance();
         MatchGenerator mg = new MatchGenerator();
 
         List<GeoNameCity> filteredCities = mg.reducedList(localDataManager.getCities(), query);
-//
-//        for (GeoNameCity temp : filteredCities)
-//        {
-//            System.out.println(temp.getName() + ", " + temp.getTimeZone() + ", " + temp.getId());
-//        }
+
         SuggestionScore sc = new SuggestionScore();
         List<GeoNameCity> storedSuggestion = sc.sortSuggestion(filteredCities, location, query);
+        JSONArray result = sc.prepareResultArray(storedSuggestion, location);
 
-        JSONArray result = sc.prepareResultArray(storedSuggestion,location);
+        System.out.println(result.toString(1));
+        System.out.println("Request Ended.");
 
-        System.out.println("_________________________");
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(result.toString());
     }
 
     /**
-     * @param query
-     * @param longitude
-     * @param latitude
-     * @return
+     * Returns true if one of the parameters is invalid, e.g. empty string     *
+     * @param  query from request
+     * @param  longitude of request
+     * @param  latitude of request
+     * @return boolean is the request invalid
      */
     private boolean invalidGetParameters(String query, String longitude, String latitude)
     {
         if (longitude == null && latitude == null)
         {
-            return !query.matches("\\w+");
+            return query.length() < 1 ||
+                    !query.matches("\\w+");
         }
         else
         {
             return longitude == null ||
                     latitude == null ||
+                    query.length() < 1 ||
+                    longitude.length() < 1 ||
+                    latitude.length() < 1 ||
                     query.matches("\\d+") ||
-                    longitude.matches("\\w+") ||
-                    latitude.matches("\\w+");
+                    !longitude.matches("\\d+") ||
+                    !latitude.matches("\\d+");
         }
     }
 }

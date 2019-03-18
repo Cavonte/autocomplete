@@ -9,14 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 public class MatchGenerator
 {
     /**
-     *
+     * Filter the list of cities based on the query.
      * @param cities
      * @param query
-     * @return
+     * @return list of cities that are eligible
      */
     public List<GeoNameCity> reducedList(HashMap<String, GeoNameCity> cities, String query)
     {
@@ -27,22 +26,23 @@ public class MatchGenerator
     }
 
     /**
+     * Use string comparison and string similarity tools to filter eligible cities.
      * Damerau -- Word Similarity Tool https://github.com/tdebatty/java-string-similarity
      *
-     * @param query
-     * @param cityName
-     * @return
+     * @param query from the request
+     * @param cityName cityName being compared
+     * @return a boolean for the filter method
      */
     public boolean eligibleCity(String query, String cityName)
     {
-        Damerau d = new Damerau();
-        double minimumChangeTolerance = 2.0;
-        String sanitized = query.trim().replaceAll("\\s+", "\\s").toLowerCase();
+        Damerau damerau = new Damerau();
+        double minimalChangeTolerance = 2.0;
+        String sanitizedQuery = query.trim().replaceAll("\\s+", "\\s").toLowerCase();
         cityName = cityName.split(",")[0].toLowerCase();
 
-        return sanitized.matches(cityName)
-                || cityName.contains(sanitized)
-                || d.distance(cityName, sanitized) < minimumChangeTolerance;
+        return sanitizedQuery.matches(cityName)
+                || cityName.contains(sanitizedQuery)
+                || damerau.distance(cityName, sanitizedQuery) < minimalChangeTolerance;
     }
 
 }

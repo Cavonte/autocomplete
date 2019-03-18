@@ -15,18 +15,18 @@ import java.util.stream.Stream;
 public class SuggestionScore
 {
      /**
-     *      * https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
-     * https://github.com/tdebatty/java-string-similarity  NormalizedLevenshtein
-     * @param filteredCities
-     * @param currentLatitude
-     * @param currentLongitude
-     * @param query
-     * @return
+      * Sort the suggestions based on the similarity with the city names and secondly based on the distance
+     * https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
+     * https://github.com/tdebatty/java-string-similarity  Damerau
+     * @param filteredCities list of already reduced cities
+     * @param location location of the request
+     * @param query initial query
+     * @return list of sorted suggestions
      */
     public List<GeoNameCity> sortSuggestion(List<GeoNameCity> filteredCities, Coordinate location, String query)
     {
         Damerau damerau = new Damerau();
-        Comparator<GeoNameCity> comparator = Comparator.comparing(city -> damerau.distance(query,city.getName()));
+        Comparator<GeoNameCity> comparator = Comparator.comparing(city -> damerau.distance(query.trim().toLowerCase(),city.getName().toLowerCase()));
         comparator = comparator.thenComparing(Comparator.comparing(city -> calculateDistance(location,city)));
 
         Stream<GeoNameCity> cityStream = filteredCities.stream().sorted(comparator);
@@ -35,12 +35,12 @@ public class SuggestionScore
 
 
     /**
-     *
-     * @param scoredList
-     * @param currentCity
-     * @return
+     *  Calculate the score of the suggestion based on the position in the array.
+     * @param  scoredList list of the suggested cities
+     * @param currentCity city entity in the list.
+     * @return double score
      */
-    public double calculateScore(List scoredList, GeoNameCity currentCity)
+    public double calculateScore(List<GeoNameCity> scoredList, GeoNameCity currentCity)
     {
         double index = scoredList.indexOf(currentCity) + 1;
         double adjustedSize = (double)scoredList.size() + 1;
@@ -49,18 +49,19 @@ public class SuggestionScore
 
 
     /**
+     * Calculate the distance between the current location and the target City
      *  http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
-     * @param location
-     * @param targetCity
-     * @return
+     * @param location of the request
+     * @param targetCity target of the calculation
+     * @return distance in kilometers
      */
     public double calculateDistance(Coordinate location, GeoNameCity targetCity)
     {
         double earthRadius = 6371.0;
-        double lat2 = Double.parseDouble(targetCity.getLatitude())/1E6;
-        double lon2 = Double.parseDouble(targetCity.getLongitude())/1E6;
-        double lat1 = location.getLatitude()/1E6;
-        double lon1 = location.getLongitude()/1E6;
+        double lat2 = Double.parseDouble(targetCity.getLatitude());
+        double lon2 = Double.parseDouble(targetCity.getLongitude());
+        double lat1 = location.getLatitude();
+        double lon1 = location.getLongitude();
         double dLat = Math.toRadians(lat2-lat1);
         double dLon = Math.toRadians(lon2-lon1);
         double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -71,19 +72,26 @@ public class SuggestionScore
     }
 
 
-    public JSONArray prepareResultArray(List<GeoNameCity> scoredList, Coordinate coordinate) throws JSONException
+    /**
+     * Extracted the response json method. Creates the json array.
+     * //name : city/timezone/ country
+     * //distance(in kilometers) : distance
+     * //score :  score
+     * //id : id of the city
+     * @param sortedList list of sorted list
+     * @param coordinate used to calculate the distance
+     * @return JSONArray
+     * @throws JSONException when creating the json string.
+     */
+    public JSONArray prepareResultArray(List<GeoNameCity> sortedList, Coordinate coordinate) throws JSONException
     {
         JSONArray result = new JSONArray();
-        for (GeoNameCity geoNameCity : scoredList)
+        for (GeoNameCity geoNameCity : sortedList)
         {
-            //name : city/timezone/ country
-            //distance(in kilometers) : distance
-            //score : current score
-            //id : id of the xity
             JSONObject cityJson = new JSONObject();
-            cityJson.put("name", geoNameCity.getName() + ", " + geoNameCity.getTimeZone() + "," + geoNameCity.getCountry());
+            cityJson.put("name", geoNameCity.getName() + ", " + geoNameCity.getTimeZone() + ", " + geoNameCity.getCountry());
             cityJson.put("distance (in km)", String.format("%.3f", calculateDistance(coordinate,geoNameCity)));
-            cityJson.put("score", String.format("%.2f", calculateScore(scoredList, geoNameCity)));
+            cityJson.put("score", Double.parseDouble(String.format("%.2f", calculateScore(sortedList, geoNameCity))));
             cityJson.put("id", geoNameCity.getId());
             result.put(cityJson);
         }

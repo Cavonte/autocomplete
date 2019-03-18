@@ -18,10 +18,13 @@ import java.util.List;
 public class DataManager
 {
     private static DataManager singleInstance = null;
-
     private HashMap<String, GeoNameCity> cities;
-    private final String FILE_PATH = "/data/cities_canada-usa.tsv";
 
+    /**
+     * Private Constructor
+     * TSV Parser
+     * TSV content for ref http://download.geonames.org/export/dump/readme.txt
+     */
     private DataManager()
     {
         cities = new HashMap<>();
@@ -32,6 +35,7 @@ public class DataManager
 
         TsvParser parser = new TsvParser(settings);
 
+        String FILE_PATH = "/data/cities_canada-usa.tsv";
         List<Record> allRecords = parser.parseAllRecords(getReader(FILE_PATH));
         for (Record record : allRecords)
         {
@@ -56,6 +60,10 @@ public class DataManager
         return cities;
     }
 
+    /**
+     * Instance manager.
+     * @return DataManager
+     */
     public static DataManager getDataManagerInstance()
     {
         if (null == singleInstance)
@@ -75,7 +83,6 @@ public class DataManager
      */
     private Reader getReader(String relativePath)
     {
-
         try
         {
             InputStream stream = getClass().getResourceAsStream(relativePath);
