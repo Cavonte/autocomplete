@@ -41,7 +41,7 @@ public class SuggestionScore
      * @param currentCity city entity in the list.
      * @return double score
      */
-    public double calculateScore(List<GeoNameCity> scoredList, GeoNameCity currentCity)
+    private double calculateScore(List<GeoNameCity> scoredList, GeoNameCity currentCity)
     {
         double index = scoredList.indexOf(currentCity) + 1;
         double adjustedSize = (double)scoredList.size() + 1;
@@ -56,7 +56,7 @@ public class SuggestionScore
      * @param targetCity target of the calculation
      * @return distance in kilometers
      */
-    public double calculateDistance(Coordinate location, GeoNameCity targetCity)
+    private double calculateDistance(Coordinate location, GeoNameCity targetCity)
     {
         double earthRadius = 6371.0;
         double lat2 = Double.parseDouble(targetCity.getLatitude());
