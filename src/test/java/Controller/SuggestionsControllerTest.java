@@ -3,6 +3,7 @@ package Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +86,6 @@ public class SuggestionsControllerTest
     public void validSuggestionRequestWithInvalidLocation() throws Exception
     {
         String url = "/suggestions";
-        String expected = "Invalid Parameters. Given: lexingt";
-
         mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
                 .param("q", "lexingt")
@@ -99,6 +98,9 @@ public class SuggestionsControllerTest
     /**
      * Checks for both the accuracy of the word similarity and the sorting of the distances when the name of the cities are similar.
      * e.g. Multiple lexingtons
+     * Checks for requirements:
+     * The endpoint returns a JSON response with an array of scored suggested matches
+     * The suggestions are sorted by descending score
      *
      * @throws Exception
      */
@@ -127,6 +129,10 @@ public class SuggestionsControllerTest
 
     /**
      * Default behavior
+     * Check for requirements:
+     * The endpoint returns a JSON response with an array of scored suggested matches
+     * Each suggestion has a name which can be used to disambiguate between similarly named locations
+     * Each suggestion has a latitude and longitude
      * @throws Exception
      */
     @Test
@@ -147,6 +153,8 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("longitude").asText()));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("latitude").asText()));
     }
 
     @Test
@@ -174,5 +182,4 @@ public class SuggestionsControllerTest
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(expected)));
     }
-
 }

@@ -79,6 +79,8 @@ public class SuggestionScore
      * //distance(in kilometers) : distance
      * //score :  score
      * //id : id of the city
+     * //longitude: longitude
+     * //latitude: latitude
      * @param sortedList list of sorted list
      * @param coordinate used to calculate the distance
      * @return JSONArray
@@ -95,6 +97,8 @@ public class SuggestionScore
             cityJson.put("distance (in km)", String.format("%.3f", calculateDistance(coordinate,geoNameCity)));
             cityJson.put("score", Double.parseDouble(String.format("%.2f", calculateScore(sortedList, geoNameCity))));
             cityJson.put("id", geoNameCity.getId());
+            cityJson.put("longitude", geoNameCity.getLongitude());
+            cityJson.put("latitude", geoNameCity.getLatitude());
             result.put(cityJson);
         }
         return result;

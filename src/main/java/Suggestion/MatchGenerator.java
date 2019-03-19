@@ -37,7 +37,7 @@ public class MatchGenerator
     {
         Damerau damerau = new Damerau();
         double minimalChangeTolerance = 2.0;
-        String sanitizedQuery = query.trim().replaceAll("\\s+", "\\s").toLowerCase();
+        String sanitizedQuery = query.trim().replaceAll("\\s+", " ").toLowerCase();
         cityName = cityName.split(",")[0].toLowerCase();
 
         return sanitizedQuery.matches(cityName)
