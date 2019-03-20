@@ -11,6 +11,11 @@ public class Coordinate
     private double longitude = 0.0;
     private double latitude = 0.0;
 
+    /**
+     *
+     * @param longitude
+     * @param latitude
+     */
     public Coordinate(double longitude, double latitude)
     {
         this.longitude = longitude;
@@ -18,6 +23,11 @@ public class Coordinate
         this.validCoordinate = true;
     }
 
+    /**
+     *
+     * @param longitude
+     * @param latitude
+     */
     public Coordinate(String longitude, String latitude)
     {
         if(longitude != null && latitude != null)

@@ -1,21 +1,17 @@
 package Suggestion;
 
-import Entity.Coordinate;
 import Entity.GeoNameCity;
 import info.debatty.java.stringsimilarity.Damerau;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MatchGenerator
 {
     /**
      * Filter the list of cities based on the query.
-     * @param cities
-     * @param query
+     * @param cities untouched list of cities
+     * @param query query passed by user.
      * @return list of cities that are eligible
      */
     public List<GeoNameCity> reducedList(List<GeoNameCity> cities, String query)

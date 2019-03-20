@@ -54,10 +54,10 @@ public class SuggestionScore
 
 
     /**
-     *  Identifiy the closest city in order to identify the country.
-     * @param location
-     * @param allCities
-     * @return
+     *  Identify the closest city in order to identify the country.
+     * @param location of the request
+     * @param allCities found in the tsv file
+     * @return the name of the city closest to the coordinate passed.
      */
     public GeoNameCity identifyClosestCity(Coordinate location, List<GeoNameCity> allCities)
     {

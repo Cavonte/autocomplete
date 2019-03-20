@@ -32,7 +32,7 @@ public class SuggestionsControllerTest
     /**
      * See method name.
      *
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void validSuggestionRequestWithNonExistentCity() throws Exception
@@ -55,7 +55,7 @@ public class SuggestionsControllerTest
     /**
      * See method name.
      *
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void validSuggestionRequestWithEdgeCases() throws Exception
@@ -79,7 +79,7 @@ public class SuggestionsControllerTest
      * Should fail if there are coordinates but one of them is invalid.
      * e.g. Multiple lexingtons
      *
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void validSuggestionRequestWithInvalidLocation() throws Exception
@@ -101,7 +101,7 @@ public class SuggestionsControllerTest
      * The endpoint returns a JSON response with an array of scored suggested matches
      * The suggestions are sorted by descending score
      *
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void validSuggestionRequestWithLocation() throws Exception
@@ -132,7 +132,7 @@ public class SuggestionsControllerTest
      * The endpoint returns a JSON response with an array of scored suggested matches
      * Each suggestion has a name which can be used to disambiguate between similarly named locations
      * Each suggestion has a latitude and longitude
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void validSuggestionRequestWithNoLocation() throws Exception
@@ -164,7 +164,7 @@ public class SuggestionsControllerTest
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
                 .param("q", "montr")
-                .param("limit","2")
+                .param("limit","3")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -175,7 +175,7 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
-        assertTrue(suggestions.length <= 2);
+        assertTrue(suggestions.length <= 3);
     }
 
     @Test
@@ -223,7 +223,7 @@ public class SuggestionsControllerTest
      * Should fail if there are coordinates but one of them is invalid.
      * e.g. Multiple lexingtons
      *
-     * @throws Exception
+     * @throws Exception java.lang exception
      */
     @Test
     public void invalidSuggestionByCountryRequest() throws Exception
@@ -286,8 +286,8 @@ public class SuggestionsControllerTest
 
         assertTrue(suggestions.length <= 4);
 
-        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Hillside, America/New_York, US"));
-        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("5099093"));
+        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Hillside, America/Chicago, US"));
+        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("4895971"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.99"));
 
 
