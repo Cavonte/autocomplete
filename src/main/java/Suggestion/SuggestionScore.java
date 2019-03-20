@@ -59,7 +59,7 @@ public class SuggestionScore
      * @param allCities
      * @return
      */
-    private GeoNameCity identifyClosestCity(Coordinate location, List<GeoNameCity> allCities)
+    public GeoNameCity identifyClosestCity(Coordinate location, List<GeoNameCity> allCities)
     {
         if(!location.isValidCoordinate() || allCities.isEmpty())
             throw new InvalidParameterException("Invalid location parameters.");

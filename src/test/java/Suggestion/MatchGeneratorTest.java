@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -16,7 +15,12 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = MatchGeneratorTest.class)
 public class MatchGeneratorTest
 {
-    private List<GeoNameCity> getInitialHashMap()
+    /**
+     * Helper method.
+     *
+     * @return list of cities
+     */
+    private List<GeoNameCity> getInitialList()
     {
         ArrayList<GeoNameCity> testmap = new ArrayList<>();
         GeoNameCity Danville = new GeoNameCity(1, "Danville", "Danville", "Danville", "11,11111", "11,11111", "US", "", "America/New York", 5);
@@ -38,13 +42,16 @@ public class MatchGeneratorTest
         return testmap;
     }
 
+    /**
+     * Validate the stream filter method and the eligible city method at the same time.
+     */
     @Test
     public void reducedListTest()
     {
         String query = "dayton";
         int expectedMatches = 4;
         MatchGenerator mg = new MatchGenerator();
-        List<GeoNameCity> reducedList = mg.reducedList(getInitialHashMap(),query);
+        List<GeoNameCity> reducedList = mg.reducedList(getInitialList(), query);
 
         assertTrue(reducedList.size() == expectedMatches);
     }
