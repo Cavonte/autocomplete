@@ -1,7 +1,7 @@
 package Suggestion;
 
 import Entity.GeoNameCity;
-import info.debatty.java.stringsimilarity.Damerau;
+import info.debatty.java.stringsimilarity.WeightedLevenshtein;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ public class MatchGenerator
 
     /**
      * Use string comparison and string similarity tools to filter eligible cities.
-     * Damerau -- Word Similarity Tool https://github.com/tdebatty/java-string-similarity
+     * WeightedLevenshtein -- Word Similarity Tool https://github.com/tdebatty/java-string-similarity
      *
      * @param query from the request
      * @param cityName cityName being compared
@@ -31,14 +31,17 @@ public class MatchGenerator
      */
     public boolean eligibleCity(String query, String cityName)
     {
-        Damerau damerau = new Damerau();
-        double minimalChangeTolerance = 2.0;
+        WordSimilarityHelper helper = new WordSimilarityHelper();
+
+        WeightedLevenshtein weightedLevenshtein = new WeightedLevenshtein(helper.getCharInterface());
+
+        double minimalChangeTolerance = 1.5;
         String sanitizedQuery = query.trim().replaceAll("\\s+", " ").toLowerCase();
         cityName = cityName.toLowerCase();
 
         return sanitizedQuery.matches(cityName)
                 || cityName.contains(sanitizedQuery)
-                || damerau.distance(cityName, sanitizedQuery) < minimalChangeTolerance;
+                || weightedLevenshtein.distance(cityName, sanitizedQuery) < minimalChangeTolerance;
     }
 
 }
