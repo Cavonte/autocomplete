@@ -24,7 +24,7 @@ public class SuggestionsController
 {
 
     /**
-     * Main enpoint. Handles request with and without a location.
+     * Main endpoint. Handles request with and without a location.
      *
      * @param query     for suggestion
      * @param longitude of request
@@ -35,12 +35,19 @@ public class SuggestionsController
     @RequestMapping(value = "/suggestions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity autoCompleteSuggestions(@RequestParam(name = "q") String query,
                                                   @RequestParam(name = "longitude", required = false) String longitude,
-                                                  @RequestParam(name = "latitude", required = false) String latitude) throws JSONException
+                                                  @RequestParam(name = "latitude", required = false) String latitude,
+                                                  @RequestParam(name = "limit", required = false) String limit) throws JSONException
     {
-        if (invalidGetParameters(query, longitude, latitude))
+        String defaultLimit = "20";
+        if (limit == null)
+        {
+            limit = defaultLimit;
+        }
+        if (invalidGetParameters(query, longitude, latitude, limit))
         {
             return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + query);
         }
+
 
         DataManager localDataManager = DataManager.getDataManagerInstance();
         MatchGenerator matchGenerator = new MatchGenerator();
@@ -49,9 +56,9 @@ public class SuggestionsController
         Coordinate location = new Coordinate(latitude, longitude);
         SuggestionScore suggestionScore = new SuggestionScore();
         List<GeoNameCity> storedSuggestion = suggestionScore.sortSuggestion(filteredCities, location, query);
-        JSONArray result = suggestionScore.prepareResultArray(storedSuggestion, location);
+        JSONArray result = suggestionScore.prepareResultArray(storedSuggestion, location, limit);
 
-        System.out.println(result.toString(1));
+        System.out.println(result.toString());
         System.out.println("Request Ended.");
 
         return ResponseEntity.ok(result.toString());
@@ -65,13 +72,14 @@ public class SuggestionsController
      * @param latitude  of request
      * @return boolean is the request invalid
      */
-    private boolean invalidGetParameters(String query, String longitude, String latitude)
+    private boolean invalidGetParameters(String query, String longitude, String latitude, String limit)
     {
         if (longitude == null && latitude == null)
         {
             return query.length() < 1 ||
                     NumberUtils.isParsable(query) ||
-                    query.matches("\\d+");
+                    query.matches("\\d+") ||
+                    !NumberUtils.isParsable(limit);
         }
         else
         {
@@ -82,7 +90,50 @@ public class SuggestionsController
                     latitude.length() < 1 ||
                     NumberUtils.isParsable(query) ||
                     !NumberUtils.isParsable(longitude) ||
-                    !NumberUtils.isParsable(longitude);
+                    !NumberUtils.isParsable(longitude) ||
+                    !NumberUtils.isParsable(limit);
         }
+    }
+
+    /**
+     * Alternated endpoint. Result are filtered by figuring out the country of the request using the coordinates.
+     *
+     * @param query     for suggestion
+     * @param longitude of request
+     * @param latitude  request
+     * @return JSON Array with suggestion
+     * @throws JSONException At response creation
+     */
+    @RequestMapping(value = "/suggestionsByCountry", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity autoCompleteSuggestionsCountry(@RequestParam(name = "q") String query,
+                                                         @RequestParam(name = "longitude") String longitude,
+                                                         @RequestParam(name = "latitude") String latitude,
+                                                         @RequestParam(name = "limit", required = false) String limit) throws JSONException
+    {
+        String defaultLimit = "20";
+        if (limit == null)
+        {
+            limit = defaultLimit;
+        }
+        if (invalidGetParameters(query, longitude, latitude, limit))
+        {
+            return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + query + ", " + longitude + ", " + latitude + ", ");
+        }
+
+        DataManager localDataManager = DataManager.getDataManagerInstance();
+        MatchGenerator matchGenerator = new MatchGenerator();
+        List<GeoNameCity> filteredCities = matchGenerator.reducedList(localDataManager.getCities(), query);
+
+        Coordinate location = new Coordinate(latitude, longitude);
+        SuggestionScore suggestionScore = new SuggestionScore();
+        List<GeoNameCity> storedSuggestion = suggestionScore.sortSuggestion(filteredCities, location, query);
+        storedSuggestion = suggestionScore.filterByCountry(storedSuggestion, location, localDataManager.getCities());
+
+        JSONArray result = suggestionScore.prepareResultArray(storedSuggestion, location, limit);
+
+        System.out.println(result.toString());
+        System.out.println("Request Ended.");
+
+        return ResponseEntity.ok(result.toString());
     }
 }

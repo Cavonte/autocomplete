@@ -1,5 +1,6 @@
 package Suggestion;
 
+import Entity.Coordinate;
 import Entity.GeoNameCity;
 import info.debatty.java.stringsimilarity.Damerau;
 
@@ -17,12 +18,11 @@ public class MatchGenerator
      * @param query
      * @return list of cities that are eligible
      */
-    public List<GeoNameCity> reducedList(HashMap<String, GeoNameCity> cities, String query)
+    public List<GeoNameCity> reducedList(List<GeoNameCity> cities, String query)
     {
-        Map<String, GeoNameCity> reducedCities = cities.entrySet().stream()
-                .filter(e -> eligibleCity(query, e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return new ArrayList<>(reducedCities.values());
+        return cities.stream()
+                .filter(e -> eligibleCity(query, e.getName()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -38,7 +38,7 @@ public class MatchGenerator
         Damerau damerau = new Damerau();
         double minimalChangeTolerance = 2.0;
         String sanitizedQuery = query.trim().replaceAll("\\s+", " ").toLowerCase();
-        cityName = cityName.split(",")[0].toLowerCase();
+        cityName = cityName.toLowerCase();
 
         return sanitizedQuery.matches(cityName)
                 || cityName.contains(sanitizedQuery)

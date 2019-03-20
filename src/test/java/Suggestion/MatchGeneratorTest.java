@@ -16,9 +16,9 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = MatchGeneratorTest.class)
 public class MatchGeneratorTest
 {
-    private HashMap<String, GeoNameCity> getInitialHashMap()
+    private List<GeoNameCity> getInitialHashMap()
     {
-        HashMap<String,GeoNameCity> testmap = new HashMap<>();
+        ArrayList<GeoNameCity> testmap = new ArrayList<>();
         GeoNameCity Danville = new GeoNameCity(1, "Danville", "Danville", "Danville", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Dayton = new GeoNameCity(2, "Dayton", "Dayton", "Dayton", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Douglass = new GeoNameCity(3, "Douglass", "Douglass", "Douglass", "11,11111", "11,11111", "US", "", "America/New York", 5);
@@ -27,13 +27,13 @@ public class MatchGeneratorTest
         GeoNameCity Daytona = new GeoNameCity(6, "Daytona", "Daytona", "Daytona", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Danton3 = new GeoNameCity(7, "Dayton", "Dayton", "Dayton", "11,11111", "11,11111", "US", "", "America/New York", 5);
 
-        testmap.put("Danville, US, America/New York, 1" , Danville);
-        testmap.put("Dayton, US,  America/New York, 2 ", Dayton);
-        testmap.put("Douglas, US, America/New York, 3", Douglass);
-        testmap.put("Edgewood, US, America/New York, 4", Edgewood);
-        testmap.put("Dayton, US, America/New York, 5", Dayton2);
-        testmap.put("Daytona, US, America/New York, 6", Daytona);
-        testmap.put("Danton, US, America/New York, 6", Danton3);
+        testmap.add(Danville);
+        testmap.add(Dayton);
+        testmap.add(Douglass);
+        testmap.add(Edgewood);
+        testmap.add(Dayton2);
+        testmap.add(Daytona);
+        testmap.add(Danton3);
 
         return testmap;
     }
@@ -89,7 +89,7 @@ public class MatchGeneratorTest
     {
         MatchGenerator matchGenerator = new MatchGenerator();
         ArrayList<String> filteredCities = new ArrayList<>();
-        String cityName = "Cinco de mayo, US, America/New York, 11111111";
+        String cityName = "Cinco de mayo";
 
         for (String candidate : getListOfCities())
         {

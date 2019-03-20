@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class DataManager
 {
     private static DataManager singleInstance = null;
-    private HashMap<String, GeoNameCity> cities;
+    private List<GeoNameCity> cities;
 
     /**
      * Private Constructor
@@ -27,7 +28,7 @@ public class DataManager
      */
     private DataManager()
     {
-        cities = new HashMap<>();
+        cities = new ArrayList<>();
 
         TsvParserSettings settings = new TsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
@@ -49,13 +50,13 @@ public class DataManager
                     record.getString("cc2"),
                     record.getString("tz"),
                     record.getInt("population"));
-            String key = record.getString("name") + ", " + record.getString("country") + ", " + record.getString("tz") + ", " + record.getInt("id");
-            cities.put(key, tempCity);
+//            String key = record.getString("name") + ", " + record.getString("country") + ", " + record.getString("tz") + ", " + record.getInt("id");
+            cities.add(tempCity);
         }
 
     }
 
-    public HashMap<String, GeoNameCity> getCities()
+    public List<GeoNameCity> getCities()
     {
         return cities;
     }

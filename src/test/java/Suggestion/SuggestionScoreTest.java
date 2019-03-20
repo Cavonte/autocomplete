@@ -42,14 +42,15 @@ public class SuggestionScoreTest
     }
 
     @Test
-    public void SortingWithValidCoordinates() throws JSONException
+    public void SortingWithInValidCoordinates() throws JSONException
     {
         Coordinate invalidCoordinate = new Coordinate(null, null);
         SuggestionScore sg = new SuggestionScore();
         String query = "lexingt";
+        String limit = "20";
 
         List<GeoNameCity> listOfCities = sg.sortSuggestion(getInitialList(), invalidCoordinate, query);
-        JSONArray preparedResultArray = sg.prepareResultArray(listOfCities, invalidCoordinate);
+        JSONArray preparedResultArray = sg.prepareResultArray(listOfCities, invalidCoordinate,limit);
 
         Double currentDistance = 0.0;
         String cityName = "Lexington";

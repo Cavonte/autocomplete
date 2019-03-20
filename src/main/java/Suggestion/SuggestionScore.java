@@ -3,10 +3,12 @@ package Suggestion;
 import Entity.Coordinate;
 import Entity.GeoNameCity;
 import info.debatty.java.stringsimilarity.Damerau;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +27,9 @@ public class SuggestionScore
      */
     public List<GeoNameCity> sortSuggestion(List<GeoNameCity> filteredCities, Coordinate location, String query)
     {
+        if(query.isEmpty() || query.matches("\\d+"))
+            throw new InvalidParameterException("Validate query. Given " + query);
+
         Damerau damerau = new Damerau();
         Comparator<GeoNameCity> comparator = Comparator.comparing(city -> damerau.distance(query.trim().toLowerCase(),city.getName().toLowerCase()));
         if(location.isValidCoordinate())
@@ -35,6 +40,46 @@ public class SuggestionScore
     }
 
 
+    public List<GeoNameCity> filterByCountry(List<GeoNameCity> filteredCities, Coordinate location, List<GeoNameCity> allCities)
+    {
+        if(allCities.isEmpty())
+            throw new InvalidParameterException("Validate input parameters.");
+
+        GeoNameCity currentCity = identifyClosestCity(location,allCities);
+
+        return filteredCities.stream()
+                .filter(e -> currentCity.getCountry().equalsIgnoreCase(e.getCountry()))
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     *  Identifiy the closest city in order to identify the country.
+     * @param location
+     * @param allCities
+     * @return
+     */
+    private GeoNameCity identifyClosestCity(Coordinate location, List<GeoNameCity> allCities)
+    {
+        if(!location.isValidCoordinate() || allCities.isEmpty())
+            throw new InvalidParameterException("Invalid location parameters.");
+
+        double smallestDistance = 3000000.0;
+        GeoNameCity closestCity = allCities.get(0);
+
+        for (GeoNameCity city: allCities)
+        {
+            double distance = calculateDistance(location,city);
+            if(smallestDistance<distance)
+            {
+                smallestDistance = distance;
+                closestCity = city;
+            }
+        }
+
+        return  closestCity;
+    }
+
     /**
      *  Calculate the score of the suggestion based on the position in the array.
      * @param  scoredList list of the suggested cities
@@ -43,6 +88,9 @@ public class SuggestionScore
      */
     private double calculateScore(List<GeoNameCity> scoredList, GeoNameCity currentCity)
     {
+        if(scoredList.isEmpty())
+            throw new InvalidParameterException("Invalid list of cities.");
+
         double index = scoredList.indexOf(currentCity) + 1;
         double adjustedSize = (double)scoredList.size() + 1;
         return 1-(index/adjustedSize);
@@ -58,6 +106,9 @@ public class SuggestionScore
      */
     private double calculateDistance(Coordinate location, GeoNameCity targetCity)
     {
+        if(!location.isValidCoordinate())
+            throw new InvalidParameterException("Invalid location provided.");
+
         double earthRadius = 6371.0;
         double lat2 = Double.parseDouble(targetCity.getLatitude());
         double lon2 = Double.parseDouble(targetCity.getLongitude());
@@ -72,7 +123,6 @@ public class SuggestionScore
         return earthRadius * c;
     }
 
-
     /**
      * Extracted the response json method. Creates the json array.
      * //name : city/timezone/ country
@@ -86,8 +136,11 @@ public class SuggestionScore
      * @return JSONArray
      * @throws JSONException when creating the json string.
      */
-    public JSONArray prepareResultArray(List<GeoNameCity> sortedList, Coordinate coordinate) throws JSONException
+    public JSONArray prepareResultArray(List<GeoNameCity> sortedList, Coordinate coordinate, String limit) throws JSONException
     {
+        if(!NumberUtils.isParsable(limit))
+         throw new InvalidParameterException("Ensure Limit is parsable as a number");
+
         JSONArray result = new JSONArray();
         for (GeoNameCity geoNameCity : sortedList)
         {
@@ -100,6 +153,11 @@ public class SuggestionScore
             cityJson.put("longitude", geoNameCity.getLongitude());
             cityJson.put("latitude", geoNameCity.getLatitude());
             result.put(cityJson);
+
+            if(result.length()== NumberUtils.createInteger(limit))
+            {
+                break;
+            }
         }
         return result;
     }

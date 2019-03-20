@@ -75,7 +75,6 @@ public class SuggestionsControllerTest
         assertTrue(suggestions.length == 0);
     }
 
-
     /**
      * Should fail if there are coordinates but one of them is invalid.
      * e.g. Multiple lexingtons
@@ -158,6 +157,28 @@ public class SuggestionsControllerTest
     }
 
     @Test
+    public void validSuggestionRequestWithSmallLimit() throws Exception
+    {
+        String url = "/suggestions";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "montr")
+                .param("limit","2")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+
+        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
+        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
+        assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
+        assertTrue(suggestions.length == 2);
+    }
+
+    @Test
     public void invalidSuggestionRequestNoParam() throws Exception
     {
         String url = "/suggestions";
@@ -181,5 +202,66 @@ public class SuggestionsControllerTest
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(expected)));
+    }
+
+    @Test
+    public void invalidSuggestionRequestInvalidLimitParam() throws Exception
+    {
+        String url = "/suggestions";
+        String expected = "Invalid Parameters. Given: londo";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "londo")
+                .param("limit","string")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString(expected)));
+    }
+
+    /**
+     * Should fail if there are coordinates but one of them is invalid.
+     * e.g. Multiple lexingtons
+     *
+     * @throws Exception
+     */
+    @Test
+    public void invalidSuggestionByCountryRequest() throws Exception
+    {
+        String url = "/suggestionsByCountry";
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "lexingt")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void validSuggestionByCountryRequest() throws Exception
+    {
+        String url = "/suggestionsByCountry";
+        String validCountry = "CA";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "montr")
+                .param("latitude", "45.5017")
+                .param("longitude", "73.5673")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+
+        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
+        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
+        assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.67"));
+
+        for(JsonNode node: suggestions)
+        {
+            String nodeCountry = node.get("name").asText().split(",")[2].trim();
+            assertTrue(nodeCountry.equalsIgnoreCase(validCountry));
+        }
     }
 }
