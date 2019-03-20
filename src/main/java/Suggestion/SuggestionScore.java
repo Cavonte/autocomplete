@@ -43,9 +43,13 @@ public class SuggestionScore
         return cityStream.collect(Collectors.toList());
     }
 
-
-
-
+    /**
+     * Filter the suggestion by country.
+     * @param filteredCities
+     * @param location
+     * @param allCities
+     * @return
+     */
     public List<GeoNameCity> filterByCountry(List<GeoNameCity> filteredCities, Coordinate location, List<GeoNameCity> allCities)
     {
         if (allCities.isEmpty())

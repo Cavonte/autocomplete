@@ -64,8 +64,8 @@ public class SuggestionsControllerTest
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
                 .param("q", "St----Coincoin ボーリング des Meumeux")
-                .param("latitude", "45.5011231237")
-                .param("longitude", "-73.567312312312")
+                .param("latitude", "45.5011231")
+                .param("longitude", "-73.231231")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -194,7 +194,7 @@ public class SuggestionsControllerTest
     public void invalidSuggestionRequestInvalidParam() throws Exception
     {
         String url = "/suggestions";
-        String expected = "Invalid Parameters. Given: 11111111";
+        String expected = "Invalid Parameters. Given: null";
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
@@ -208,7 +208,7 @@ public class SuggestionsControllerTest
     public void invalidSuggestionRequestInvalidLimitParam() throws Exception
     {
         String url = "/suggestions";
-        String expected = "Invalid Parameters. Given: londo";
+        String expected = "Invalid Parameters. Given: null";
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get(url)

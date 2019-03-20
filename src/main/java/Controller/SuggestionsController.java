@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -45,7 +48,8 @@ public class SuggestionsController
         }
         if (invalidGetParameters(query, longitude, latitude, limit))
         {
-            return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + query);
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + request.getQueryString());
         }
 
 
@@ -88,9 +92,13 @@ public class SuggestionsController
                     query.length() < 1 ||
                     longitude.length() < 1 ||
                     latitude.length() < 1 ||
+                    longitude.length() > 10 ||
+                    latitude.length() > 10 ||
+                    query.matches("\\d+") ||
                     NumberUtils.isParsable(query) ||
                     !NumberUtils.isParsable(longitude) ||
-                    !NumberUtils.isParsable(longitude) ||
+                    !NumberUtils.isParsable(latitude) ||
+                    limit.length() > 8 ||
                     !NumberUtils.isParsable(limit);
         }
     }
@@ -117,7 +125,8 @@ public class SuggestionsController
         }
         if (invalidGetParameters(query, longitude, latitude, limit))
         {
-            return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + query + ", " + longitude + ", " + latitude + ", ");
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + request.getQueryString());
         }
 
         DataManager localDataManager = DataManager.getDataManagerInstance();
