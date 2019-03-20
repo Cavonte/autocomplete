@@ -42,7 +42,7 @@ public class SuggestionsControllerTest
                 .get(url)
                 .param("q", "St-Coincoin des Meumeux")
                 .param("latitude", "45.5017")
-                .param("longitude", "73.5673")
+                .param("longitude", "-73.5673")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -65,7 +65,7 @@ public class SuggestionsControllerTest
                 .get(url)
                 .param("q", "St----Coincoin ボーリング des Meumeux")
                 .param("latitude", "45.5011231237")
-                .param("longitude", "73.567312312312")
+                .param("longitude", "-73.567312312312")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -111,7 +111,7 @@ public class SuggestionsControllerTest
                 .get(url)
                 .param("q", "lexingt")
                 .param("latitude", "45.5017")
-                .param("longitude", "73.5673")
+                .param("longitude", "-73.5673")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -175,7 +175,7 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
-        assertTrue(suggestions.length == 2);
+        assertTrue(suggestions.length <= 2);
     }
 
     @Test
@@ -244,9 +244,9 @@ public class SuggestionsControllerTest
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
-                .param("q", "montr")
+                .param("q", "lond")
                 .param("latitude", "45.5017")
-                .param("longitude", "73.5673")
+                .param("longitude", "-73.5878")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -254,9 +254,42 @@ public class SuggestionsControllerTest
         ObjectMapper mapper = new ObjectMapper();
         JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
 
-        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
-        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
-        assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.67"));
+        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("London, America/Toronto, CA"));
+        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6058560"));
+        assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.5"));
+
+        for(JsonNode node: suggestions)
+        {
+            String nodeCountry = node.get("name").asText().split(",")[2].trim();
+            assertTrue(nodeCountry.equalsIgnoreCase(validCountry));
+        }
+    }
+
+    @Test
+    public void validSuggestionByCountryRequestWithLimit() throws Exception
+    {
+        String url = "/suggestionsByCountry";
+        String validCountry = "US";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                .get(url)
+                .param("q", "hills")
+                .param("latitude", "33.44872")
+                .param("longitude", "-86.78777")
+                .param("limit","4")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode[] suggestions = mapper.readValue(mvcResult.getResponse().getContentAsString(), JsonNode[].class);
+
+        assertTrue(suggestions.length <= 4);
+
+        assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Hillside, America/New_York, US"));
+        assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("5099093"));
+        assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.99"));
+
 
         for(JsonNode node: suggestions)
         {

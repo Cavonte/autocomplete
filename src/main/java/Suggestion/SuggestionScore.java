@@ -70,7 +70,7 @@ public class SuggestionScore
         for (GeoNameCity city: allCities)
         {
             double distance = calculateDistance(location,city);
-            if(smallestDistance<distance)
+            if(distance<smallestDistance)
             {
                 smallestDistance = distance;
                 closestCity = city;

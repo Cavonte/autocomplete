@@ -53,7 +53,7 @@ public class SuggestionsController
         MatchGenerator matchGenerator = new MatchGenerator();
         List<GeoNameCity> filteredCities = matchGenerator.reducedList(localDataManager.getCities(), query);
 
-        Coordinate location = new Coordinate(latitude, longitude);
+        Coordinate location = new Coordinate(longitude,latitude);
         SuggestionScore suggestionScore = new SuggestionScore();
         List<GeoNameCity> storedSuggestion = suggestionScore.sortSuggestion(filteredCities, location, query);
         JSONArray result = suggestionScore.prepareResultArray(storedSuggestion, location, limit);
@@ -124,7 +124,7 @@ public class SuggestionsController
         MatchGenerator matchGenerator = new MatchGenerator();
         List<GeoNameCity> filteredCities = matchGenerator.reducedList(localDataManager.getCities(), query);
 
-        Coordinate location = new Coordinate(latitude, longitude);
+        Coordinate location = new Coordinate(longitude,latitude);
         SuggestionScore suggestionScore = new SuggestionScore();
         List<GeoNameCity> storedSuggestion = suggestionScore.sortSuggestion(filteredCities, location, query);
         storedSuggestion = suggestionScore.filterByCountry(storedSuggestion, location, localDataManager.getCities());

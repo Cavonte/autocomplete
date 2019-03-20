@@ -32,7 +32,7 @@ public class GeoNameCity
      * @param altCountryCode
      * @param population
      */
-    public GeoNameCity(int id, String name, String ascii, String altName, String latitude, String longitude, String country, String altCountryCode,String timeZone, int population)
+    public GeoNameCity(int id, String name, String ascii, String altName, String longitude, String latitude, String country, String altCountryCode,String timeZone, int population)
     {
         this.id = id;
         this.name = name;
