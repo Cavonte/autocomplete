@@ -21,7 +21,7 @@ Parameters
 - q   (required)  //query e.g. londo, montre, montreal
 - latitude (optional) // 33.4487 (Close to Vestavia Hills), 45.5017 (Close to Montreal)
 - latitude (optional) // -86.7666 (Close to Vestavia Hills), -73.5555 (Close to Montreal)
-- limit (optional) //how many results default is 20
+- limit (optional) //How many results are sent back. Default is 20
 
 **/suggestionsByCountry**
 This call requires the coordinate of the request to pinpoint the country and filter the suggestion accordingly.
@@ -32,7 +32,7 @@ Parameters
 - q   (required)  //query e.g. londo, montre, montreal
 - latitude (required) // 33.4487 (Close to Vestavia Hills), 45.5017 (Close to Montreal
 - latitude (required) // -86.7666 (Close to Vestavia Hills), -73.5555 (Close to Montreal)
-- limit (optional) //how many results default is 20
+- limit (optional) //How many results are sent back. Default is 20
 
 
 ## Main Flow
@@ -46,12 +46,12 @@ Parameters
 - The results are filtered using based on how close the name of the city and the query of the request. (The tolerance can be adjusted)
 - 2 comparator are used to sort the results.
   1)Word Similarity
-  2)Distance between the coordinate ( if provided) and the city.
+  2)Distance between the coordinate (if provided) and the city.
  
 
 ## Neat features
 - Changes can be made to the filters with peace of mind because the functional tests will catch any major issues.
-- The word similarity library integration allows for better suggestion since it can take typos into account. The same type of
+- The word similarity library integration allows for better suggestion since it takes typos into account. The same type of
   algorithms are used in autocorrct engines.
 - If the coordinates are specified, the closest city can be approximated and subsequently the country. This can then be used to 
   calculate the distances.
@@ -63,3 +63,4 @@ Parameters
 - Distance Between 2 set of Coordinates - http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
 - Word Similarity Library - https://github.com/tdebatty/java-string-similarity
 - Number Utils - Apache Commons Lang3
+- Built-in JSON Library of Spring
