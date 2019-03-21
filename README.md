@@ -51,7 +51,7 @@ Parameters
 
 ## Neat features
 - Changes can be made to the filters with peace of mind because the functional tests will catch any major issues.
-- The word similarity library integration allows for better suggestion since it can take types into account. The same type of
+- The word similarity library integration allows for better suggestion since it can take typos into account. The same type of
   algorithms are used in autocorrct engines.
 - If the coordinates are specified, the closest city can be approximated and subsequently the country. This can then be used to 
   calculate the distances.
