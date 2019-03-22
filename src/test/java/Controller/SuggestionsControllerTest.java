@@ -175,6 +175,8 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Montréal, America/Montreal, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6077243"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.86"));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("longitude").asText()));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("latitude").asText()));
         assertTrue(suggestions.length <= 3);
     }
 
@@ -236,6 +238,10 @@ public class SuggestionsControllerTest
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * Example with Canada
+     * @throws Exception
+     */
     @Test
     public void validSuggestionByCountryRequest() throws Exception
     {
@@ -257,6 +263,8 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("London, America/Toronto, CA"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("6058560"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.5"));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("longitude").asText()));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("latitude").asText()));
 
         for(JsonNode node: suggestions)
         {
@@ -289,7 +297,8 @@ public class SuggestionsControllerTest
         assertTrue(suggestions[0].get("name").asText().equalsIgnoreCase("Hillside, America/Chicago, US"));
         assertTrue(suggestions[0].get("id").asText().equalsIgnoreCase("4895971"));
         assertTrue(suggestions[0].get("score").asText().equalsIgnoreCase("0.99"));
-
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("longitude").asText()));
+        assertTrue(NumberUtils.isParsable(suggestions[0].get("latitude").asText()));
 
         for(JsonNode node: suggestions)
         {

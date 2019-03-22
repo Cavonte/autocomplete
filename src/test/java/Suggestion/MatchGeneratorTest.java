@@ -22,7 +22,7 @@ public class MatchGeneratorTest
      */
     private List<GeoNameCity> getInitialList()
     {
-        ArrayList<GeoNameCity> testmap = new ArrayList<>();
+        ArrayList<GeoNameCity> testlist = new ArrayList<>();
         GeoNameCity Danville = new GeoNameCity(1, "Danville", "Danville", "Danville", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Dayton = new GeoNameCity(2, "Dayton", "Dayton", "Dayton", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Douglass = new GeoNameCity(3, "Douglass", "Douglass", "Douglass", "11,11111", "11,11111", "US", "", "America/New York", 5);
@@ -31,15 +31,15 @@ public class MatchGeneratorTest
         GeoNameCity Daytona = new GeoNameCity(6, "Daytona", "Daytona", "Daytona", "11,11111", "11,11111", "US", "", "America/New York", 5);
         GeoNameCity Danton3 = new GeoNameCity(7, "Dayton", "Dayton", "Dayton", "11,11111", "11,11111", "US", "", "America/New York", 5);
 
-        testmap.add(Danville);
-        testmap.add(Dayton);
-        testmap.add(Douglass);
-        testmap.add(Edgewood);
-        testmap.add(Dayton2);
-        testmap.add(Daytona);
-        testmap.add(Danton3);
+        testlist.add(Danville);
+        testlist.add(Dayton);
+        testlist.add(Douglass);
+        testlist.add(Edgewood);
+        testlist.add(Dayton2);
+        testlist.add(Daytona);
+        testlist.add(Danton3);
 
-        return testmap;
+        return testlist;
     }
 
     /**
