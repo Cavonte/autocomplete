@@ -43,7 +43,7 @@ Parameters
 4) Json array with the result is prepared and returned.
 
 ## Filters and Sorting
-- The results are filtered using based on how close the name of the city and the query of the request. (The tolerance can be adjusted)
+- The results are filtered based on how close the name of the city and the query of the request. (The tolerance can be adjusted)
 - 2 comparator are used to sort the results.
   1)Word Similarity
   2)Distance between the coordinate (if provided) and the city.
