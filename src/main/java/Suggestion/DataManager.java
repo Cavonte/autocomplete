@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Class which parses the tsv file.
  */
 public class DataManager
 {
@@ -49,7 +49,6 @@ public class DataManager
                     record.getString("cc2"),
                     record.getString("tz"),
                     record.getInt("population"));
-//            String key = record.getString("name") + ", " + record.getString("country") + ", " + record.getString("tz") + ", " + record.getInt("id");
             cities.add(tempCity);
         }
 

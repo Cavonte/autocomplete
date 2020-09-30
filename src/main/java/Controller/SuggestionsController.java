@@ -46,12 +46,12 @@ public class SuggestionsController
         {
             limit = defaultLimit;
         }
+
         if (invalidGetParameters(query, longitude, latitude, limit))
         {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             return ResponseEntity.badRequest().body("Invalid Parameters. Given: " + request.getQueryString());
         }
-
 
         DataManager localDataManager = DataManager.getDataManagerInstance();
         MatchGenerator matchGenerator = new MatchGenerator();

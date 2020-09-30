@@ -3,6 +3,7 @@ package Suggestion;
 import Entity.GeoNameCity;
 import info.debatty.java.stringsimilarity.WeightedLevenshtein;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,9 @@ public class MatchGenerator
      */
     public List<GeoNameCity> reducedList(List<GeoNameCity> cities, String query)
     {
+        if (query.isEmpty())
+            throw new InvalidParameterException("Validate query. Given " + query);
+
         return cities.stream()
                 .filter(e -> eligibleCity(query, e.getName()))
                 .collect(Collectors.toList());
@@ -31,6 +35,9 @@ public class MatchGenerator
      */
     public boolean eligibleCity(String query, String cityName)
     {
+        if (query.isEmpty() || cityName.isEmpty())
+            throw new InvalidParameterException("Validate parameters. Given " + query + ", " +  cityName);
+
         WordSimilarityHelper helper = new WordSimilarityHelper();
 
         WeightedLevenshtein weightedLevenshtein = new WeightedLevenshtein(helper.getCharInterface());

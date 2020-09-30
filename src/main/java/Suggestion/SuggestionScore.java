@@ -45,15 +45,19 @@ public class SuggestionScore
 
     /**
      * Filter the suggestion by country.
-     * @param filteredCities
-     * @param location
-     * @param allCities
-     * @return
+     *
+     * @param filteredCities list of cities
+     * @param location       coordinate
+     * @param allCities      initial list from the data manager
+     * @return list of filter
      */
     public List<GeoNameCity> filterByCountry(List<GeoNameCity> filteredCities, Coordinate location, List<GeoNameCity> allCities)
     {
         if (allCities.isEmpty())
-            throw new InvalidParameterException("Validate input parameters.");
+            throw new InvalidParameterException("Validate input parameters. Initial list of cities is invalid.");
+
+        if (!location.isValidCoordinate())
+            throw new InvalidParameterException("Cannot find country with invalid location.");
 
         GeoNameCity currentCity = identifyClosestCity(location, allCities);
 
@@ -64,7 +68,7 @@ public class SuggestionScore
 
 
     /**
-     * Identify the closest city in order to identify the country.
+     * Identify the closest city.
      *
      * @param location  of the request
      * @param allCities found in the tsv file
@@ -101,7 +105,7 @@ public class SuggestionScore
     private double calculateScore(List<GeoNameCity> scoredList, GeoNameCity currentCity)
     {
         if (scoredList.isEmpty())
-            throw new InvalidParameterException("Invalid list of cities.");
+            throw new InvalidParameterException("Invalid list of scored cities.");
 
         double index = scoredList.indexOf(currentCity) + 1;
         double adjustedSize = (double) scoredList.size() + 1;
@@ -111,9 +115,9 @@ public class SuggestionScore
 
     /**
      * Calculate the distance between the current location and the target City
-     * http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
+     * Credit: http://www.codecodex.com/wiki/Calculate_Distance_Between_Two_Points_on_a_Globe#Java
      *
-     * @param location   of the request
+     * @param location  of the request
      * @param targetCity target of the calculation
      * @return distance in kilometers
      */
@@ -137,7 +141,7 @@ public class SuggestionScore
     }
 
     /**
-     * Extracted the response json method. Creates the json array.
+     * Creates the json array to be returned.
      * //name : city/timezone/ country
      * //distance(in kilometers) : distance
      * //score :  score

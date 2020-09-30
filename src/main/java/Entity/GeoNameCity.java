@@ -1,5 +1,8 @@
 package Entity;
 
+/**
+ * Entity class
+ */
 public class GeoNameCity
 {
     private int id;
